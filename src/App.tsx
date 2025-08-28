@@ -21,6 +21,8 @@ import SettingsPage from './pages/SettingsPage';
 import BrokerDashboardPage from './pages/BrokerDashboardPage';
 import ClientManagementPage from './pages/ClientManagementPage';
 import AIInsightsPage from './pages/AIInsightsPage';
+import PipelinePage from './pages/PipelinePage';
+import ReportsPage from './pages/ReportsPage';
 
 // Import components
 import ProtectedRoute from './components/ProtectedRoute';
@@ -115,6 +117,22 @@ const App: React.FC = () => {
                   element={
                     <ProtectedRoute userType="broker">
                       <AIInsightsPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/pipeline"
+                  element={
+                    <ProtectedRoute userType="broker">
+                      <PipelinePage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/reports"
+                  element={
+                    <ProtectedRoute userType="broker">
+                      <ReportsPage />
                     </ProtectedRoute>
                   }
                 />
