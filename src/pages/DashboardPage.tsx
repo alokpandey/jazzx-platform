@@ -17,7 +17,7 @@ const DashboardPage: React.FC = () => {
         ]);
 
         setDashboardData({
-          applications: applicationsResponse.data || [],
+          applications: (applicationsResponse.data as any) || [],
           aiInsights: (aiInsightsResponse.data as any)?.insights || []
         });
       } catch (error) {

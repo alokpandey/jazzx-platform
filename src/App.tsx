@@ -23,6 +23,7 @@ import ClientManagementPage from './pages/ClientManagementPage';
 import AIInsightsPage from './pages/AIInsightsPage';
 import PipelinePage from './pages/PipelinePage';
 import ReportsPage from './pages/ReportsPage';
+import PlaceholderPage from './components/PlaceholderPage';
 
 // Import components
 import ProtectedRoute from './components/ProtectedRoute';
@@ -133,6 +134,40 @@ const App: React.FC = () => {
                   element={
                     <ProtectedRoute userType="broker">
                       <ReportsPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/documents"
+                  element={
+                    <ProtectedRoute>
+                      <DocumentsPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/messages"
+                  element={
+                    <ProtectedRoute>
+                      <PlaceholderPage
+                        title="Messages"
+                        description="Communicate with your broker and loan team"
+                        icon="💬"
+                        showSidebar={true}
+                      />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/settings"
+                  element={
+                    <ProtectedRoute>
+                      <PlaceholderPage
+                        title="Settings"
+                        description="Manage your account preferences and notifications"
+                        icon="⚙️"
+                        showSidebar={true}
+                      />
                     </ProtectedRoute>
                   }
                 />
