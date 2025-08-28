@@ -202,19 +202,24 @@ const LoginPage: React.FC = () => {
     }
 
     try {
+      console.log('Attempting login...');
       await login({
         email,
         password,
         userType: 'borrower',
       });
-      
+
+      console.log('Login successful, showing notification...');
       showNotification('Welcome back! Redirecting to your dashboard...', 'success');
-      
+
+      console.log('Navigating to:', from);
       setTimeout(() => {
+        console.log('Executing navigation...');
         navigate(from, { replace: true });
       }, 1500);
     } catch (error) {
-      // Error is handled by the auth hook and displayed via notification
+      console.error('Login failed:', error);
+      showNotification('Login failed. Please check your credentials.', 'error');
     }
   };
 
