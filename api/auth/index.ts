@@ -113,13 +113,14 @@ async function handleLogin(body: any) {
             body: {
                 success: true,
                 data: {
-                    token: "mock-jwt-token-" + Date.now(),
                     user: {
                         id: user.userType === "borrower" ? "user-1" : "broker-1",
                         email: user.email,
                         userType: user.userType,
                         name: user.userType === "borrower" ? "Demo User" : "Demo Broker"
-                    }
+                    },
+                    token: "mock-jwt-token-" + Date.now(),
+                    refreshToken: "mock-refresh-token-" + Date.now()
                 }
             }
         };
@@ -136,18 +137,20 @@ async function handleLogin(body: any) {
 
 async function handleRegister(body: any) {
     await new Promise(resolve => setTimeout(resolve, 2000));
-    
+
     return {
         status: 200,
         body: {
             success: true,
             data: {
-                message: "Registration successful",
                 user: {
                     id: "user-" + Date.now(),
                     email: body.email,
-                    userType: body.userType || "borrower"
-                }
+                    userType: body.userType || "borrower",
+                    name: body.name || "New User"
+                },
+                token: "mock-jwt-token-" + Date.now(),
+                refreshToken: "mock-refresh-token-" + Date.now()
             }
         }
     };
