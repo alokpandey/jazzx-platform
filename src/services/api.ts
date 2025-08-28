@@ -5,13 +5,13 @@ class ApiService {
   private client: AxiosInstance;
 
   constructor() {
-    // Use the global axios instance so mocks work
-    this.client = axios;
-
-    // Configure defaults
-    this.client.defaults.baseURL = import.meta.env.VITE_API_BASE_URL || '/api';
-    this.client.defaults.timeout = 10000;
-    this.client.defaults.headers.common['Content-Type'] = 'application/json';
+    this.client = axios.create({
+      baseURL: import.meta.env.VITE_API_BASE_URL || '/api',
+      timeout: 10000,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
 
     // Request interceptor
     this.client.interceptors.request.use(

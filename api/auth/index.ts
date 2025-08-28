@@ -1,9 +1,9 @@
 import { app, HttpRequest, HttpResponseInit, InvocationContext } from "@azure/functions";
 
 export async function authHandler(request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> {
-    const path = request.params.path;
+    const path = request.params.path || '';
     const method = request.method;
-    
+
     // CORS headers
     const corsHeaders = {
         "Access-Control-Allow-Origin": "*",
@@ -13,11 +13,10 @@ export async function authHandler(request: HttpRequest, context: InvocationConte
 
     // Handle preflight requests
     if (method === "OPTIONS") {
-        context.res = {
+        return {
             status: 200,
             headers: corsHeaders
         };
-        return;
     }
 
     try {
@@ -26,7 +25,8 @@ export async function authHandler(request: HttpRequest, context: InvocationConte
         switch (path) {
             case "login":
                 if (method === "POST") {
-                    response = await handleLogin(req.body);
+                    const body = await request.json();
+                    response = await handleLogin(body);
                 } else {
                     response = { status: 405, body: { error: "Method not allowed" } };
                 }
@@ -34,7 +34,8 @@ export async function authHandler(request: HttpRequest, context: InvocationConte
                 
             case "register":
                 if (method === "POST") {
-                    response = await handleRegister(req.body);
+                    const body = await request.json();
+                    response = await handleRegister(body);
                 } else {
                     response = { status: 405, body: { error: "Method not allowed" } };
                 }
@@ -42,7 +43,8 @@ export async function authHandler(request: HttpRequest, context: InvocationConte
                 
             case "me":
                 if (method === "GET") {
-                    response = await handleGetUser(req.headers.authorization);
+                    const authorization = request.headers.get('authorization');
+                    response = await handleGetUser(authorization);
                 } else {
                     response = { status: 405, body: { error: "Method not allowed" } };
                 }
@@ -72,20 +74,23 @@ export async function authHandler(request: HttpRequest, context: InvocationConte
                 response = { status: 404, body: { error: "Endpoint not found" } };
         }
 
-        context.res = {
+        return {
             status: response.status,
-            body: response.body,
+            body: JSON.stringify(response.body),
             headers: {
                 ...corsHeaders,
                 "Content-Type": "application/json"
             }
         };
-        
+
     } catch (error) {
-        context.res = {
+        return {
             status: 500,
-            body: { error: "Internal server error" },
-            headers: corsHeaders
+            body: JSON.stringify({ error: "Internal server error" }),
+            headers: {
+                ...corsHeaders,
+                "Content-Type": "application/json"
+            }
         };
     }
 };
@@ -182,4 +187,10 @@ async function handleLogout() {
     };
 }
 
-export default httpTrigger;
+// Register the function
+app.http('auth', {
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    authLevel: 'anonymous',
+    route: 'auth/{*path}',
+    handler: authHandler
+});

@@ -1,8 +1,8 @@
-import { AzureFunction, Context, HttpRequest } from "@azure/functions";
+import { app, HttpRequest, HttpResponseInit, InvocationContext } from "@azure/functions";
 
-const httpTrigger: AzureFunction = async function (context: Context, req: HttpRequest): Promise<void> {
-    const path = req.params.path;
-    const method = req.method;
+export async function loansHandler(request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> {
+    const path = request.params.path || '';
+    const method = request.method;
     
     // CORS headers
     const corsHeaders = {
@@ -13,11 +13,10 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
 
     // Handle preflight requests
     if (method === "OPTIONS") {
-        context.res = {
+        return {
             status: 200,
             headers: corsHeaders
         };
-        return;
     }
 
     try {
@@ -26,7 +25,8 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
         switch (path) {
             case "quote":
                 if (method === "POST") {
-                    response = await handleQuote(req.body);
+                    const body = await request.json();
+                    response = await handleQuote(body);
                 } else {
                     response = { status: 405, body: { error: "Method not allowed" } };
                 }
@@ -36,7 +36,8 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
                 if (method === "GET") {
                     response = await handleGetApplications();
                 } else if (method === "POST") {
-                    response = await handleCreateApplication(req.body);
+                    const body = await request.json();
+                    response = await handleCreateApplication(body);
                 } else {
                     response = { status: 405, body: { error: "Method not allowed" } };
                 }
@@ -58,20 +59,23 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
                 response = { status: 404, body: { error: "Endpoint not found" } };
         }
 
-        context.res = {
+        return {
             status: response.status,
-            body: response.body,
+            body: JSON.stringify(response.body),
             headers: {
                 ...corsHeaders,
                 "Content-Type": "application/json"
             }
         };
-        
+
     } catch (error) {
-        context.res = {
+        return {
             status: 500,
-            body: { error: "Internal server error" },
-            headers: corsHeaders
+            body: JSON.stringify({ error: "Internal server error" }),
+            headers: {
+                ...corsHeaders,
+                "Content-Type": "application/json"
+            }
         };
     }
 };
@@ -140,4 +144,10 @@ async function handleCreateApplication(body: any) {
     };
 }
 
-export default httpTrigger;
+// Register the function
+app.http('loans', {
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    authLevel: 'anonymous',
+    route: 'loans/{*path}',
+    handler: loansHandler
+});

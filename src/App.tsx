@@ -25,8 +25,8 @@ import AIInsightsPage from './pages/AIInsightsPage';
 // Import components
 import ProtectedRoute from './components/ProtectedRoute';
 
-// Initialize microservices architecture
-import './services/microservices';
+// Microservices are now deployed as real Azure Functions
+// import './services/microservices';
 
 const App: React.FC = () => {
   return (
