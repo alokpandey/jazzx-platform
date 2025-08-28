@@ -1,0 +1,48 @@
+{
+  "name": "jazzx-platform",
+  "version": "1.0.0",
+  "description": "AI-Powered Mortgage Platform by Alok Pandey",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "test": "playwright test",
+    "test:ui": "playwright test --ui",
+    "test:headed": "playwright test --headed",
+    "test:debug": "playwright test --debug",
+    "test:report": "playwright show-report",
+    "test:auth": "playwright test tests/auth.spec.ts",
+    "test:borrower": "playwright test tests/borrower-flow.spec.ts",
+    "test:broker": "playwright test tests/broker-flow.spec.ts",
+    "test:navigation": "playwright test tests/navigation.spec.ts",
+    "test:ui-components": "playwright test tests/ui-components.spec.ts",
+    "test:complete": "playwright test tests/complete-flow.spec.ts",
+    "test:all": "npm run test:auth && npm run test:complete",
+    "test:demo": "playwright test tests/complete-flow.spec.ts --headed"
+  },
+  "dependencies": {
+    "@types/styled-components": "^5.1.34",
+    "axios": "^1.6.2",
+    "axios-mock-adapter": "^1.22.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.20.1",
+    "styled-components": "^6.1.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.55.0",
+    "@types/react": "^18.2.37",
+    "@types/react-dom": "^18.2.15",
+    "@typescript-eslint/eslint-plugin": "^6.10.0",
+    "@typescript-eslint/parser": "^6.10.0",
+    "@vitejs/plugin-react": "^4.1.1",
+    "eslint": "^8.53.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.4",
+    "playwright": "^1.55.0",
+    "typescript": "^5.2.2",
+    "vite": "^5.0.0"
+  }
+}
