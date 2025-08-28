@@ -105,17 +105,21 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       dispatch({ type: 'AUTH_START' });
       const response = await authService.login(credentials);
-      
+
       if (response.success && response.data) {
         dispatch({ type: 'AUTH_SUCCESS', payload: response.data.user });
       } else {
-        dispatch({ type: 'AUTH_FAILURE', payload: response.message || 'Login failed' });
+        const errorMessage = response.message || 'Login failed';
+        dispatch({ type: 'AUTH_FAILURE', payload: errorMessage });
+        throw new Error(errorMessage);
       }
     } catch (error) {
-      dispatch({ 
-        type: 'AUTH_FAILURE', 
-        payload: error instanceof Error ? error.message : 'Login failed' 
+      const errorMessage = error instanceof Error ? error.message : 'Login failed';
+      dispatch({
+        type: 'AUTH_FAILURE',
+        payload: errorMessage
       });
+      throw error;
     }
   };
 
@@ -123,17 +127,21 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       dispatch({ type: 'AUTH_START' });
       const response = await authService.register(userData);
-      
+
       if (response.success && response.data) {
         dispatch({ type: 'AUTH_SUCCESS', payload: response.data.user });
       } else {
-        dispatch({ type: 'AUTH_FAILURE', payload: response.message || 'Registration failed' });
+        const errorMessage = response.message || 'Registration failed';
+        dispatch({ type: 'AUTH_FAILURE', payload: errorMessage });
+        throw new Error(errorMessage);
       }
     } catch (error) {
-      dispatch({ 
-        type: 'AUTH_FAILURE', 
-        payload: error instanceof Error ? error.message : 'Registration failed' 
+      const errorMessage = error instanceof Error ? error.message : 'Registration failed';
+      dispatch({
+        type: 'AUTH_FAILURE',
+        payload: errorMessage
       });
+      throw error;
     }
   };
 
