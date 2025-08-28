@@ -25,8 +25,7 @@ import AIInsightsPage from './pages/AIInsightsPage';
 // Import components
 import ProtectedRoute from './components/ProtectedRoute';
 
-// Microservices are now deployed as real Azure Functions
-// import './services/microservices';
+// Real Azure Functions backend deployed - no client-side mocks needed
 
 const App: React.FC = () => {
   return (

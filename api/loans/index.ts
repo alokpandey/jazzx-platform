@@ -1,8 +1,8 @@
-import { app, HttpRequest, HttpResponseInit, InvocationContext } from "@azure/functions";
+import { AzureFunction, Context, HttpRequest } from "@azure/functions";
 
-export async function loansHandler(request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> {
-    const path = request.params.path || '';
-    const method = request.method;
+const httpTrigger: AzureFunction = async function (context: Context, req: HttpRequest): Promise<void> {
+    const path = req.params.path || '';
+    const method = req.method;
     
     // CORS headers
     const corsHeaders = {
@@ -13,10 +13,11 @@ export async function loansHandler(request: HttpRequest, context: InvocationCont
 
     // Handle preflight requests
     if (method === "OPTIONS") {
-        return {
+        context.res = {
             status: 200,
             headers: corsHeaders
         };
+        return;
     }
 
     try {
@@ -25,8 +26,7 @@ export async function loansHandler(request: HttpRequest, context: InvocationCont
         switch (path) {
             case "quote":
                 if (method === "POST") {
-                    const body = await request.json();
-                    response = await handleQuote(body);
+                    response = await handleQuote(req.body);
                 } else {
                     response = { status: 405, body: { error: "Method not allowed" } };
                 }
@@ -36,8 +36,7 @@ export async function loansHandler(request: HttpRequest, context: InvocationCont
                 if (method === "GET") {
                     response = await handleGetApplications();
                 } else if (method === "POST") {
-                    const body = await request.json();
-                    response = await handleCreateApplication(body);
+                    response = await handleCreateApplication(req.body);
                 } else {
                     response = { status: 405, body: { error: "Method not allowed" } };
                 }
@@ -59,9 +58,9 @@ export async function loansHandler(request: HttpRequest, context: InvocationCont
                 response = { status: 404, body: { error: "Endpoint not found" } };
         }
 
-        return {
+        context.res = {
             status: response.status,
-            body: JSON.stringify(response.body),
+            body: response.body,
             headers: {
                 ...corsHeaders,
                 "Content-Type": "application/json"
@@ -69,9 +68,9 @@ export async function loansHandler(request: HttpRequest, context: InvocationCont
         };
 
     } catch (error) {
-        return {
+        context.res = {
             status: 500,
-            body: JSON.stringify({ error: "Internal server error" }),
+            body: { error: "Internal server error" },
             headers: {
                 ...corsHeaders,
                 "Content-Type": "application/json"
@@ -144,10 +143,4 @@ async function handleCreateApplication(body: any) {
     };
 }
 
-// Register the function
-app.http('loans', {
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    authLevel: 'anonymous',
-    route: 'loans/{*path}',
-    handler: loansHandler
-});
+export default httpTrigger;

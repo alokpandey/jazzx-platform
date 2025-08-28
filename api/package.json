@@ -2,18 +2,17 @@
   "name": "jazzx-platform-api",
   "version": "1.0.0",
   "description": "JazzX Platform Microservices API",
-  "main": "dist/src/functions/*.js",
+  "main": "index.js",
   "scripts": {
     "build": "tsc",
     "start": "func start",
-    "prestart": "npm run build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "@azure/functions": "^4.5.0"
+    "@azure/functions": "^3.5.1"
   },
   "devDependencies": {
-    "@types/node": "^20.0.0",
-    "typescript": "^5.0.0"
+    "@types/node": "^18.0.0",
+    "typescript": "^4.9.0"
   }
 }
