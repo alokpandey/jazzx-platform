@@ -66,7 +66,7 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
                 "Content-Type": "application/json"
             }
         };
-
+        
     } catch (error) {
         context.res = {
             status: 500,

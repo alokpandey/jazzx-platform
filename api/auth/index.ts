@@ -3,7 +3,7 @@ import { AzureFunction, Context, HttpRequest } from "@azure/functions";
 const httpTrigger: AzureFunction = async function (context: Context, req: HttpRequest): Promise<void> {
     const path = req.params.path || '';
     const method = req.method;
-
+    
     // CORS headers
     const corsHeaders = {
         "Access-Control-Allow-Origin": "*",
@@ -80,7 +80,7 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
                 "Content-Type": "application/json"
             }
         };
-
+        
     } catch (error) {
         context.res = {
             status: 500,
