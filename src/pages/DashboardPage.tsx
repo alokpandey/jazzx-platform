@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { apiService } from '@/services/api';
+import { useAuth } from '@/hooks/useAuth';
 
 const DashboardPage: React.FC = () => {
   const navigate = useNavigate();
+  const { logout } = useAuth();
   const [dashboardData, setDashboardData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
@@ -57,6 +59,11 @@ const DashboardPage: React.FC = () => {
     fetchDashboardData();
   }, []);
 
+  const handleLogout = async () => {
+    await logout();
+    navigate('/');
+  };
+
   if (loading) {
     return <LoadingContainer>Loading your dashboard...</LoadingContainer>;
   }
@@ -64,7 +71,12 @@ const DashboardPage: React.FC = () => {
   return (
     <Container>
       <Sidebar>
-        <SidebarTitle>🏠 Borrower Portal</SidebarTitle>
+        <SidebarHeader>
+          <SidebarTitle>🏠 Borrower Portal</SidebarTitle>
+          <LogoutButton onClick={handleLogout}>
+            🏠 Home
+          </LogoutButton>
+        </SidebarHeader>
         <NavItem onClick={() => navigate('/dashboard')} active>
           📊 Dashboard
         </NavItem>
@@ -208,12 +220,34 @@ const Sidebar = styled.div`
   padding: 2rem 0;
 `;
 
+const SidebarHeader = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 0 1.5rem;
+  margin-bottom: 2rem;
+`;
+
 const SidebarTitle = styled.h2`
   color: #2d3748;
   font-size: 1.2rem;
   font-weight: 700;
-  padding: 0 1.5rem;
-  margin-bottom: 2rem;
+`;
+
+const LogoutButton = styled.button`
+  background: #f7fafc;
+  color: #4a5568;
+  border: 1px solid #e2e8f0;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    background: #edf2f7;
+    color: #2d3748;
+  }
 `;
 
 const NavItem = styled.div<{ active?: boolean }>`
