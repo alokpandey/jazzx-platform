@@ -160,7 +160,7 @@ const BrokerDashboardPage: React.FC = () => {
 
         <QuickActions>
           <ActionButton primary onClick={() => navigate('/client-management')}>
-            + Add New Client
+            👥 Manage Clients
           </ActionButton>
           <ActionButton onClick={() => navigate('/pipeline')}>
             📈 View Pipeline

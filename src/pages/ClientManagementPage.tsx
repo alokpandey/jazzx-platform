@@ -10,6 +10,12 @@ const ClientManagementPage: React.FC = () => {
   const [clients, setClients] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
+  const [newClient, setNewClient] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    loanAmount: ''
+  });
 
   useEffect(() => {
     const fetchClients = async () => {
@@ -50,6 +56,59 @@ const ClientManagementPage: React.FC = () => {
   const handleLogout = async () => {
     await logout();
     navigate('/');
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setNewClient(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleAddClient = async (e: React.FormEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    // Validate form
+    if (!newClient.name || !newClient.email || !newClient.phone || !newClient.loanAmount) {
+      alert('Please fill in all fields');
+      return;
+    }
+
+    try {
+      // Add the new client to the local state immediately (optimistic update)
+      const addedClient = {
+        id: `client-${Date.now()}`,
+        name: newClient.name,
+        email: newClient.email,
+        phone: newClient.phone,
+        loanAmount: parseInt(newClient.loanAmount) || 0,
+        status: 'New Lead',
+        lastContact: new Date().toISOString().split('T')[0]
+      };
+
+      setClients(prev => [addedClient, ...prev]);
+
+      // Reset form and close modal
+      setNewClient({ name: '', email: '', phone: '', loanAmount: '' });
+      setShowAddForm(false);
+
+      // Show success message
+      alert('Client added successfully!');
+
+      // Call the API in the background (don't wait for it)
+      apiService.post('/broker/clients', {
+        name: addedClient.name,
+        email: addedClient.email,
+        phone: addedClient.phone,
+        loanAmount: addedClient.loanAmount
+      }).catch(error => {
+        console.error('Failed to sync client to server:', error);
+        // Could show a warning that it's saved locally but not synced
+      });
+
+    } catch (error) {
+      console.error('Failed to add client:', error);
+      alert('Failed to add client. Please try again.');
+    }
   };
 
   if (loading) {
@@ -136,32 +195,64 @@ const ClientManagementPage: React.FC = () => {
         </ClientsGrid>
 
         {showAddForm && (
-          <AddClientModal>
-            <ModalContent>
+          <AddClientModal onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              setShowAddForm(false);
+            }
+          }}>
+            <ModalContent onClick={(e) => e.stopPropagation()}>
               <ModalHeader>
                 <ModalTitle>Add New Client</ModalTitle>
                 <CloseButton onClick={() => setShowAddForm(false)}>×</CloseButton>
               </ModalHeader>
-              <AddClientForm>
+              <AddClientForm onSubmit={handleAddClient}>
                 <FormGroup>
                   <Label>Full Name</Label>
-                  <Input type="text" placeholder="John Smith" />
+                  <Input
+                    type="text"
+                    name="name"
+                    value={newClient.name}
+                    onChange={handleInputChange}
+                    placeholder="John Smith"
+                    required
+                  />
                 </FormGroup>
                 <FormGroup>
                   <Label>Email</Label>
-                  <Input type="email" placeholder="john@email.com" />
+                  <Input
+                    type="email"
+                    name="email"
+                    value={newClient.email}
+                    onChange={handleInputChange}
+                    placeholder="john@email.com"
+                    required
+                  />
                 </FormGroup>
                 <FormGroup>
                   <Label>Phone</Label>
-                  <Input type="tel" placeholder="(555) 123-4567" />
+                  <Input
+                    type="tel"
+                    name="phone"
+                    value={newClient.phone}
+                    onChange={handleInputChange}
+                    placeholder="(555) 123-4567"
+                    required
+                  />
                 </FormGroup>
                 <FormGroup>
                   <Label>Loan Amount</Label>
-                  <Input type="number" placeholder="500000" />
+                  <Input
+                    type="number"
+                    name="loanAmount"
+                    value={newClient.loanAmount}
+                    onChange={handleInputChange}
+                    placeholder="500000"
+                    required
+                  />
                 </FormGroup>
                 <FormActions>
-                  <ActionButton primary>Add Client</ActionButton>
-                  <ActionButton onClick={() => setShowAddForm(false)}>Cancel</ActionButton>
+                  <ActionButton type="submit" primary>Add Client</ActionButton>
+                  <ActionButton type="button" onClick={() => setShowAddForm(false)}>Cancel</ActionButton>
                 </FormActions>
               </AddClientForm>
             </ModalContent>
@@ -387,6 +478,11 @@ const ActionButton = styled.button<{ primary?: boolean }>`
   &:hover {
     transform: translateY(-1px);
     box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+  }
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.3);
   }
 `;
 
