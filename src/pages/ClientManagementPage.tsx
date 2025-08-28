@@ -10,6 +10,7 @@ const ClientManagementPage: React.FC = () => {
   const [clients, setClients] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
+  const [addingClient, setAddingClient] = useState(false);
   const [newClient, setNewClient] = useState({
     name: '',
     email: '',
@@ -73,18 +74,32 @@ const ClientManagementPage: React.FC = () => {
       return;
     }
 
+    setAddingClient(true);
+
     try {
-      // Add the new client to the local state immediately (optimistic update)
-      const addedClient = {
-        id: `client-${Date.now()}`,
+      // Prepare client data
+      const clientData = {
         name: newClient.name,
         email: newClient.email,
         phone: newClient.phone,
-        loanAmount: parseInt(newClient.loanAmount) || 0,
-        status: 'New Lead',
-        lastContact: new Date().toISOString().split('T')[0]
+        loanAmount: parseInt(newClient.loanAmount) || 0
       };
 
+      // Call the API and wait for confirmation
+      const response = await apiService.post('/broker/clients', clientData);
+
+      // Create the client object with server response data
+      const addedClient = {
+        id: (response.data as any)?.id || `client-${Date.now()}`,
+        name: clientData.name,
+        email: clientData.email,
+        phone: clientData.phone,
+        loanAmount: clientData.loanAmount,
+        status: (response.data as any)?.status || 'New Lead',
+        lastContact: (response.data as any)?.createdDate?.split('T')[0] || new Date().toISOString().split('T')[0]
+      };
+
+      // Add to the client list only after server confirmation
       setClients(prev => [addedClient, ...prev]);
 
       // Reset form and close modal
@@ -92,22 +107,13 @@ const ClientManagementPage: React.FC = () => {
       setShowAddForm(false);
 
       // Show success message
-      alert('Client added successfully!');
-
-      // Call the API in the background (don't wait for it)
-      apiService.post('/broker/clients', {
-        name: addedClient.name,
-        email: addedClient.email,
-        phone: addedClient.phone,
-        loanAmount: addedClient.loanAmount
-      }).catch(error => {
-        console.error('Failed to sync client to server:', error);
-        // Could show a warning that it's saved locally but not synced
-      });
+      alert('Client added successfully and saved to server!');
 
     } catch (error) {
       console.error('Failed to add client:', error);
-      alert('Failed to add client. Please try again.');
+      alert('Failed to add client to server. Please check your connection and try again.');
+    } finally {
+      setAddingClient(false);
     }
   };
 
@@ -215,6 +221,7 @@ const ClientManagementPage: React.FC = () => {
                     onChange={handleInputChange}
                     placeholder="John Smith"
                     required
+                    disabled={addingClient}
                   />
                 </FormGroup>
                 <FormGroup>
@@ -226,6 +233,7 @@ const ClientManagementPage: React.FC = () => {
                     onChange={handleInputChange}
                     placeholder="john@email.com"
                     required
+                    disabled={addingClient}
                   />
                 </FormGroup>
                 <FormGroup>
@@ -237,6 +245,7 @@ const ClientManagementPage: React.FC = () => {
                     onChange={handleInputChange}
                     placeholder="(555) 123-4567"
                     required
+                    disabled={addingClient}
                   />
                 </FormGroup>
                 <FormGroup>
@@ -248,11 +257,24 @@ const ClientManagementPage: React.FC = () => {
                     onChange={handleInputChange}
                     placeholder="500000"
                     required
+                    disabled={addingClient}
                   />
                 </FormGroup>
                 <FormActions>
-                  <ActionButton type="submit" primary>Add Client</ActionButton>
-                  <ActionButton type="button" onClick={() => setShowAddForm(false)}>Cancel</ActionButton>
+                  <ActionButton
+                    type="submit"
+                    primary
+                    disabled={addingClient}
+                  >
+                    {addingClient ? '🔄 Adding Client...' : 'Add Client'}
+                  </ActionButton>
+                  <ActionButton
+                    type="button"
+                    onClick={() => setShowAddForm(false)}
+                    disabled={addingClient}
+                  >
+                    Cancel
+                  </ActionButton>
                 </FormActions>
               </AddClientForm>
             </ModalContent>
@@ -475,7 +497,7 @@ const ActionButton = styled.button<{ primary?: boolean }>`
   color: ${props => props.primary ? 'white' : '#667eea'};
   border: ${props => props.primary ? 'none' : '1px solid #667eea'};
 
-  &:hover {
+  &:hover:not(:disabled) {
     transform: translateY(-1px);
     box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
   }
@@ -483,6 +505,12 @@ const ActionButton = styled.button<{ primary?: boolean }>`
   &:focus {
     outline: none;
     box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.3);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
   }
 `;
 
@@ -558,9 +586,15 @@ const Input = styled.input`
   font-size: 1rem;
   transition: border-color 0.2s;
 
-  &:focus {
+  &:focus:not(:disabled) {
     outline: none;
     border-color: #667eea;
+  }
+
+  &:disabled {
+    background-color: #f7fafc;
+    color: #a0aec0;
+    cursor: not-allowed;
   }
 `;
 
