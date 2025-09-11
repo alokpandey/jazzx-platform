@@ -369,7 +369,7 @@ class AIMicroservice {
       service: 'ai-service',
       status: 'healthy',
       timestamp: new Date().toISOString(),
-      version: '2.1.0',
+      version: '2.0.1',
       models: {
         'loan-matching': { status: 'active', accuracy: '94.2%', version: 'v2.1' },
         'risk-assessment': { status: 'active', accuracy: '91.8%', version: 'v2.0' },

@@ -350,7 +350,7 @@ const LandingPage: React.FC = () => {
         color: '#6b7280',
         fontSize: '0.875rem'
       }}>
-        <p>🚀 JazzX Platform v1.0.1 | Deployed: {new Date().toLocaleDateString()} | CI/CD: GitHub Actions → Azure</p>
+        <p>🚀 JazzX Platform v2.0.1 | Deployed: {new Date().toLocaleDateString()} | CI/CD: GitHub Actions → Azure</p>
         <p style={{ marginTop: '0.5rem', fontSize: '0.75rem' }}>
           ✅ Auto-deployed from main branch | Build #{Math.floor(Math.random() * 1000) + 100}
         </p>
