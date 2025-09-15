@@ -4,11 +4,12 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
     const path = req.params.path || '';
     const method = req.method;
     
-    // CORS headers
+    // CORS headers - Updated for Azure Static Web Apps
     const corsHeaders = {
         "Access-Control-Allow-Origin": "*",
         "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-        "Access-Control-Allow-Headers": "Content-Type, Authorization"
+        "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Requested-With, Accept, Origin",
+        "Access-Control-Allow-Credentials": "true"
     };
 
     // Handle preflight requests
@@ -22,7 +23,7 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
 
     try {
         let response;
-        
+
         switch (path) {
             case "login":
                 if (method === "POST") {
@@ -96,7 +97,18 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
 async function handleLogin(body: any) {
     // Simulate processing delay
     await new Promise(resolve => setTimeout(resolve, 1500));
-    
+
+    // Check if body exists
+    if (!body) {
+        return {
+            status: 400,
+            body: {
+                success: false,
+                error: "Request body is required"
+            }
+        };
+    }
+
     const { email, password } = body;
     
     // Demo credentials

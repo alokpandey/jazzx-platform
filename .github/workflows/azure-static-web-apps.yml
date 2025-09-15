@@ -33,6 +33,7 @@ jobs:
         env:
           VITE_ENVIRONMENT: production
           VITE_ENABLE_MOCK_SERVER: false
+          VITE_API_BASE_URL: /api
 
       - name: Build And Deploy
         id: builddeploy
