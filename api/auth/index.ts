@@ -48,6 +48,30 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
                     response = { status: 405, body: { error: "Method not allowed" } };
                 }
                 break;
+
+            case "google":
+                if (method === "POST") {
+                    response = await handleSocialLogin(req.body, "google");
+                } else {
+                    response = { status: 405, body: { error: "Method not allowed" } };
+                }
+                break;
+
+            case "microsoft":
+                if (method === "POST") {
+                    response = await handleSocialLogin(req.body, "microsoft");
+                } else {
+                    response = { status: 405, body: { error: "Method not allowed" } };
+                }
+                break;
+
+            case "apple":
+                if (method === "POST") {
+                    response = await handleSocialLogin(req.body, "apple");
+                } else {
+                    response = { status: 405, body: { error: "Method not allowed" } };
+                }
+                break;
                 
             case "logout":
                 if (method === "POST") {
@@ -196,6 +220,30 @@ async function handleLogout() {
         body: {
             success: true,
             data: { message: "Logged out successfully" }
+        }
+    };
+}
+
+async function handleSocialLogin(body: any, provider: string) {
+    // Simulate processing delay for SSO
+    await new Promise(resolve => setTimeout(resolve, 2000));
+
+    // For demo purposes, always return broker credentials for SSO
+    return {
+        status: 200,
+        body: {
+            success: true,
+            data: {
+                user: {
+                    id: "broker-1",
+                    email: "broker@company.com",
+                    userType: "broker",
+                    name: "Demo Broker",
+                    provider: provider
+                },
+                token: "mock-jwt-token-" + Date.now(),
+                refreshToken: "mock-refresh-token-" + Date.now()
+            }
         }
     };
 }

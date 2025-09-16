@@ -145,10 +145,42 @@ const SignupLink = styled(Link)`
   color: ${({ theme }) => theme.colors.primary[600]};
   font-weight: ${({ theme }) => theme.fontWeights.medium};
   text-decoration: none;
-  
+
   &:hover {
     text-decoration: underline;
   }
+`;
+
+const Divider = styled.div`
+  display: flex;
+  align-items: center;
+  margin: ${({ theme }) => theme.spacing[6]} 0;
+
+  &::before,
+  &::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: ${({ theme }) => theme.colors.neutral[300]};
+  }
+
+  span {
+    padding: 0 ${({ theme }) => theme.spacing[4]};
+    color: ${({ theme }) => theme.colors.neutral[500]};
+    font-size: ${({ theme }) => theme.fontSizes.sm};
+  }
+`;
+
+const SocialLoginContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: ${({ theme }) => theme.spacing[3]};
+  margin-bottom: ${({ theme }) => theme.spacing[6]};
+`;
+
+const SocialButton = styled(Button)`
+  justify-content: center;
+  gap: ${({ theme }) => theme.spacing[2]};
 `;
 
 const BrokerLoginPage: React.FC = () => {
@@ -224,7 +256,7 @@ const BrokerLoginPage: React.FC = () => {
   const handleDemoLogin = async () => {
     setEmail('broker@company.com');
     setPassword('Broker123!');
-    
+
     setTimeout(async () => {
       try {
         await login({
@@ -232,9 +264,9 @@ const BrokerLoginPage: React.FC = () => {
           password: 'Broker123!',
           userType: 'broker',
         });
-        
+
         showNotification('Demo login successful! Welcome to JazzX Pro...', 'success');
-        
+
         setTimeout(() => {
           navigate(from, { replace: true });
         }, 1500);
@@ -242,6 +274,29 @@ const BrokerLoginPage: React.FC = () => {
         // Error handled by auth hook
       }
     }, 500);
+  };
+
+  const handleSocialLogin = async (provider: string) => {
+    showNotification(`${provider} SSO login initiated...`, 'info');
+
+    // Simulate SSO login for broker
+    setTimeout(async () => {
+      try {
+        await login({
+          email: 'broker@company.com',
+          password: 'Broker123!',
+          userType: 'broker',
+        });
+
+        showNotification(`Successfully logged in with ${provider}! Redirecting to broker dashboard...`, 'success');
+
+        setTimeout(() => {
+          navigate(from, { replace: true });
+        }, 1500);
+      } catch (error) {
+        showNotification(`${provider} login failed. Please try again.`, 'error');
+      }
+    }, 1000);
   };
 
   return (
@@ -323,6 +378,37 @@ const BrokerLoginPage: React.FC = () => {
               Access Broker Portal
             </Button>
           </LoginForm>
+
+          <Divider>
+            <span>Or continue with</span>
+          </Divider>
+
+          <SocialLoginContainer>
+            <SocialButton
+              variant="outline"
+              fullWidth
+              onClick={() => handleSocialLogin('Microsoft')}
+              leftIcon="🪟"
+            >
+              Continue with Microsoft
+            </SocialButton>
+            <SocialButton
+              variant="outline"
+              fullWidth
+              onClick={() => handleSocialLogin('Google')}
+              leftIcon="🔍"
+            >
+              Continue with Google
+            </SocialButton>
+            <SocialButton
+              variant="outline"
+              fullWidth
+              onClick={() => handleSocialLogin('Apple')}
+              leftIcon="🍎"
+            >
+              Continue with Apple
+            </SocialButton>
+          </SocialLoginContainer>
 
           <BorrowerLoginPrompt>
             <strong>Looking for a loan?</strong>

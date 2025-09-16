@@ -47,7 +47,7 @@ const BrokerDashboardPage: React.FC = () => {
         <SidebarHeader>
           <SidebarTitle>🏢 Broker Portal</SidebarTitle>
           <LogoutButton onClick={handleLogout}>
-            🏠 Home
+            🚪 Logout
           </LogoutButton>
         </SidebarHeader>
         <NavItem onClick={() => navigate('/broker-dashboard')} active>
